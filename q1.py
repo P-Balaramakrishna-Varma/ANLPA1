@@ -78,19 +78,25 @@ class NueralLanguageModel(nn.Module):
     def __init__(self, vocab_size):
         super().__init__()
         self.hidden1 = nn.Linear(300 * 5, 300)
+        self.activation = nn.ReLU()
         self.hidden2 = nn.Linear(300, vocab_size)
         self.softmax = nn.Softmax(dim=1)
  
     def forward(self, x):
+        # converts input into 300 dim vector
         x = self.hidden1(x)
+        x = self.activation(x)
+        
+        # converts 300 dim vector into vocab_size dim vector
         x = self.hidden2(x)
         x = self.softmax(x)
         return x
  
    
-# dataset = NGramDataset('Auguste_Maquet.txt')
-# dataloader = DataLoader(dataset, batch_size=256, shuffle=False)
-# Model = NueralLanguageModel(len(dataset.vocab)).to('cuda')
-# for X, y in tqdm(dataloader):
-#     X, y = X.to('cuda'), y.to('cuda')
-#     pred = Model(X)
+dataset = NGramDataset('Auguste_Maquet.txt')
+print("vocab size ", len(dataset.vocab))
+dataloader = DataLoader(dataset, batch_size=1, shuffle=True)
+Model = NueralLanguageModel(len(dataset.vocab)).to('cuda')
+for X, y in tqdm(dataloader):
+    X, y = X.to('cuda'), y.to('cuda')
+    pred = Model(X)
