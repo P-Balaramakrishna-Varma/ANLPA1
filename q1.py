@@ -5,6 +5,8 @@ from torch.utils.data.dataset import ConcatDataset, Dataset
 import torchtext
 from torch.utils.data import Dataset, DataLoader
 from collections import Counter, OrderedDict
+import torch.nn as nn
+from tqdm import tqdm
 
 
 # read the entrire file into a string
@@ -54,7 +56,7 @@ class NGramDataset(Dataset):
         self.pretrained_embedding = torchtext.vocab.GloVe(name='6B', dim=300)
         
         # Creating vocabulary
-        self.vocab = torchtext.vocab.build_vocab_from_iterator(self.tokens)
+        self.vocab = torchtext.vocab.build_vocab_from_iterator([[token] for token in self.tokens])
         self.vocab.set_default_index(0)
         
     def __len__(self):
@@ -72,14 +74,23 @@ class NGramDataset(Dataset):
         return X, y
     
  
+class NueralLanguageModel(nn.Module):
+    def __init__(self, vocab_size):
+        super().__init__()
+        self.hidden1 = nn.Linear(300 * 5, 300)
+        self.hidden2 = nn.Linear(300, vocab_size)
+        self.softmax = nn.Softmax(dim=1)
  
- 
- 
- 
- 
+    def forward(self, x):
+        x = self.hidden1(x)
+        x = self.hidden2(x)
+        x = self.softmax(x)
+        return x
  
    
-# dataset = NGramDataset('Auguste_Maquet.txt')    
-# dataloader = DataLoader(dataset, batch_size=1, shuffle=False)
-# for X, y in dataloader:
-#     print(X, "\n\n", y)
+# dataset = NGramDataset('Auguste_Maquet.txt')
+# dataloader = DataLoader(dataset, batch_size=256, shuffle=False)
+# Model = NueralLanguageModel(len(dataset.vocab)).to('cuda')
+# for X, y in tqdm(dataloader):
+#     X, y = X.to('cuda'), y.to('cuda')
+#     pred = Model(X)
