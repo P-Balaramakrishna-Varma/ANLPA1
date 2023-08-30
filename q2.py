@@ -128,16 +128,52 @@ def test_loop(dataloader, model, loss_fun, device):
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
             
     test_loss /= len(dataloader)
-    correct /= (len(dataloader.dataset) * dataloader.dataset.seq_len)
-    return test_loss, correct
+    correct /= (len(dataloader.dataset) * X.shape[1])
+    return test_loss, correct, 1
  
+ 
+def plot_stats(stats):
+    x = range(len(stats))
+    loss = [stat[0] for stat in stats]
+    accuracy = [stat[1] for stat in stats]
+    perplexity = [stat[2] for stat in stats]
+    
+    plt.clf()
+    plt.plot(x, loss, label='loss')
+    #plt.plot(x, accuracy, label='accuracy')
+    plt.savefig('r_acc_loss.png')
+    
+    plt.clf()
+    plt.plot(x, perplexity, label='perplexity')
+    plt.savefig('r_perplexity.png')
+  
 
-dataset = LSTMDataset('Auguste_Maquet.txt', 5)
-dataloader = DataLoader(dataset, batch_size=512, shuffle=True)
-Model = ReccurentLanguageModel(len(dataset.vocab)).to('cuda')
-loss_fn = nn.CrossEntropyLoss()
-optimizer = torch.optim.Adam(Model.parameters(), lr=0.001)
+if __name__ == "__main__":        
+    # hyperparameters
+    device = 'cuda'
+    batch_size = 1024
+    epcohs = 4
+    seq_len = 5
+   
+    # Data creation
+    dataset = LSTMDataset('Auguste_Maquet.txt', seq_len)
+    train_data, valid_data, test_data = random_split(dataset, [0.8, 0.1, 0.1])
+    train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
+    valid_dataloader = DataLoader(valid_data, batch_size=batch_size, shuffle=True)
+    test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=True)
 
-print(test_loop(dataloader, Model, loss_fn, 'cuda'))
-train_loop(dataloader, Model, loss_fn, optimizer, 'cuda')
-print(test_loop(dataloader, Model, loss_fn, 'cuda'))
+    # Model creation
+    Model = ReccurentLanguageModel(len(dataset.vocab)).to(device)
+    
+    # Training
+    loss_fn = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(Model.parameters(), lr=0.1)
+    stats = []
+    for epoch in tqdm(range(epcohs)):
+        train_loop(train_dataloader, Model, loss_fn, optimizer, device)
+        stats.append(test_loop(valid_dataloader, Model, loss_fn, device))
+    plot_stats(stats)
+    
+    # Testing
+    Results = test_loop(test_dataloader, Model, loss_fn, device)
+    print(Results)

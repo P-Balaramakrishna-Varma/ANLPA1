@@ -143,11 +143,11 @@ def plot_stats(stats):
     plt.clf()
     plt.plot(x, loss, label='loss')
     #plt.plot(x, accuracy, label='accuracy')
-    plt.savefig('acc_loss.png')
+    plt.savefig('n_acc_loss.png')
     
     plt.clf()
     plt.plot(x, perplexity, label='perplexity')
-    plt.savefig('perplexity.png')
+    plt.savefig('n_perplexity.png')
     
 
 if __name__ == "__main__":        
