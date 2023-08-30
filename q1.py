@@ -109,6 +109,27 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
         optimizer.zero_grad()
         
        
+def test_loop(dataloader, model, loss_fun, device):
+    model.eval()
+    test_loss, correct = 0, 0
+    with torch.no_grad():
+        for X, y in tqdm(dataloader):
+            # getting data
+            X, y = X.to(device), y.to(device)
+            
+            # forward pass
+            pred = model(X)
+            
+            # stats
+            test_loss += loss_fun(pred, y).item()
+            correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+            
+    test_loss /= len(dataloader)
+    correct /= len(dataloader.dataset)
+    return test_loss, correct
+
+
+
         
 # dataset = NGramDataset('Auguste_Maquet.txt')
 # print("vocab size ", len(dataset.vocab))
@@ -117,4 +138,6 @@ def train_loop(dataloader, model, loss_fn, optimizer, device):
 # loss_fn = nn.CrossEntropyLoss()
 # optimizer = torch.optim.Adam(Model.parameters(), lr=0.1)
 
+# print(test_loop(dataloader, Model, loss_fn, "cuda"))
 # train_loop(dataloader, Model, loss_fn, optimizer, "cuda")
+# print(test_loop(dataloader, Model, loss_fn, "cuda"))
