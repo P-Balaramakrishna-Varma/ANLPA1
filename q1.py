@@ -7,6 +7,7 @@ from torch.utils.data import Dataset, DataLoader
 from collections import Counter, OrderedDict
 import torch.nn as nn
 from tqdm import tqdm
+from math import exp as exponential
 
 
 # read the entrire file into a string
@@ -124,9 +125,14 @@ def test_loop(dataloader, model, loss_fun, device):
             test_loss += loss_fun(pred, y).item()
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
             
+            
     test_loss /= len(dataloader)
+    try:
+        peprlexity = exponential(test_loss)
+    except OverflowError:
+        peprlexity = float('inf')
     correct /= len(dataloader.dataset)
-    return test_loss, correct
+    return test_loss, correct, peprlexity
 
 
 
