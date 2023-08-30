@@ -46,7 +46,7 @@ def test_get_tokens_from_text_corpus():
 
 
 # Custom dataset
-class NGramDataset(Dataset):
+class LSTMDataset(Dataset):
     def __init__(self, filename, len) :
         super().__init__()
         # Preprocessing the text corpus
@@ -74,9 +74,28 @@ class NGramDataset(Dataset):
         y = torch.tensor(y)
         return X, y
  
+
+class ReccurentLanguageModel(nn.Module):
+    def __init__(self, vocab_size):
+        super().__init__()
+        self.lstm = nn.LSTM(input_size=300, hidden_size=500, batch_first=True)
+        self.hidden2 = nn.Linear(500, vocab_size)
+        self.softmax = nn.Softmax(dim=2)
  
+    def forward(self, x):
+        # Lstm layer with 500 dim output
+        x, hidden = self.lstm(x)
+        
+        # converts 500 dim vector into vocab_size dim vector
+        x = self.hidden2(x)
+        x = self.softmax(x)
+        return x
+
+
+
  
-# dataset = NGramDataset('Auguste_Maquet.txt', 5)
-# dataloader = DataLoader(dataset, batch_size=1, shuffle=False)
-# for X, y in tqdm(dataloader):
-#     print(X, "\n", y, "\n\n")
+dataset = LSTMDataset('Auguste_Maquet.txt', 5)
+dataloader = DataLoader(dataset, batch_size=512, shuffle=True)
+Model = ReccurentLanguageModel(len(dataset.vocab))
+for X, y in tqdm(dataloader):
+    pred = Model(X)
