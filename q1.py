@@ -56,8 +56,8 @@ class NGramDataset(Dataset):
         self.pretrained_embedding = torchtext.vocab.GloVe(name='6B', dim=300)
         
         # Creating vocabulary
-        self.vocab = torchtext.vocab.build_vocab_from_iterator([[token] for token in self.tokens])
-        self.vocab.set_default_index(0)
+        self.vocab = torchtext.vocab.build_vocab_from_iterator([[token] for token in self.tokens], specials=["<unk>"])
+        self.vocab.set_default_index(self.vocab["<unk>"])
         
     def __len__(self):
         return len(self.tokens) - 5
@@ -91,12 +91,30 @@ class NueralLanguageModel(nn.Module):
         x = self.hidden2(x)
         x = self.softmax(x)
         return x
- 
-   
-dataset = NGramDataset('Auguste_Maquet.txt')
-print("vocab size ", len(dataset.vocab))
-dataloader = DataLoader(dataset, batch_size=1, shuffle=True)
-Model = NueralLanguageModel(len(dataset.vocab)).to('cuda')
-for X, y in tqdm(dataloader):
-    X, y = X.to('cuda'), y.to('cuda')
-    pred = Model(X)
+
+
+def train_loop(dataloader, model, loss_fn, optimizer, device):
+    model.train()
+    for X, y in tqdm(dataloader):
+        # data
+        X, y = X.to(device), y.to(device)
+        
+        # forward pass
+        pred = model(X)
+        loss = loss_fn(pred, y)
+        
+        # backpropagation
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+        
+       
+        
+# dataset = NGramDataset('Auguste_Maquet.txt')
+# print("vocab size ", len(dataset.vocab))
+# dataloader = DataLoader(dataset, batch_size=512, shuffle=True)
+# Model = NueralLanguageModel(len(dataset.vocab)).to('cuda')
+# loss_fn = nn.CrossEntropyLoss()
+# optimizer = torch.optim.Adam(Model.parameters(), lr=0.1)
+
+# train_loop(dataloader, Model, loss_fn, optimizer, "cuda")
