@@ -128,8 +128,12 @@ def test_loop(dataloader, model, loss_fun, device):
             correct += (pred.argmax(1) == y).type(torch.float).sum().item()
             
     test_loss /= len(dataloader)
+    try:
+        peprlexity = exponential(test_loss)
+    except OverflowError:
+        peprlexity = float('inf')
     correct /= (len(dataloader.dataset) * X.shape[1])
-    return test_loss, correct, 1
+    return test_loss, correct, peprlexity
  
  
 def plot_stats(stats):
