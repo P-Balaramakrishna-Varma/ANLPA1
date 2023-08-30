@@ -153,7 +153,7 @@ def plot_stats(stats):
 if __name__ == "__main__":        
     # hyperparameters
     device = 'cuda'
-    batch_size = 512
+    batch_size = 1024
     epcohs = 4
    
     # Data creation
