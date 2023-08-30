@@ -56,7 +56,7 @@ class NGramDataset(Dataset):
         self.pretrained_embedding = torchtext.vocab.GloVe(name='6B', dim=300)
         
         # Creating vocabulary
-        self.vocab = torchtext.vocab.build_vocab_from_iterator([[token] for token in self.tokens], specials=["<unk>"])
+        self.vocab = torchtext.vocab.build_vocab_from_iterator([[token] for token in self.tokens], min_freq=2, specials=["<unk>"])
         self.vocab.set_default_index(self.vocab["<unk>"])
         
     def __len__(self):
