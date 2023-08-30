@@ -92,10 +92,29 @@ class ReccurentLanguageModel(nn.Module):
         return x
 
 
+def train_loop(dataloader, model, loss_fn, optimizer, device):
+    model.train()
+    for X, y in tqdm(dataloader):
+        # data
+        X, y = X.to(device), y.to(device)
+        
+        # forward pass
+        pred = model(X)
+        y = y.reshape(-1)
+        pred = pred.reshape(-1, pred.shape[2])
+        loss = loss_fn(pred, y)
+        
+        # backpropagation
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
 
  
+
 dataset = LSTMDataset('Auguste_Maquet.txt', 5)
 dataloader = DataLoader(dataset, batch_size=512, shuffle=True)
-Model = ReccurentLanguageModel(len(dataset.vocab))
-for X, y in tqdm(dataloader):
-    pred = Model(X)
+Model = ReccurentLanguageModel(len(dataset.vocab)).to('cuda')
+loss_fn = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(Model.parameters(), lr=0.001)
+
+train_loop(dataloader, Model, loss_fn, optimizer, 'cuda')
