@@ -1,13 +1,12 @@
 import nltk
 import string
 import torch
-from torch.utils.data.dataset import ConcatDataset, Dataset
 import torchtext
-from torch.utils.data import Dataset, DataLoader
-from collections import Counter, OrderedDict
+from torch.utils.data import Dataset, DataLoader, random_split
 import torch.nn as nn
 from tqdm import tqdm
 from math import exp as exponential
+import matplotlib.pyplot as plt
 
 
 # read the entrire file into a string
@@ -96,7 +95,7 @@ class NueralLanguageModel(nn.Module):
 
 def train_loop(dataloader, model, loss_fn, optimizer, device):
     model.train()
-    for X, y in tqdm(dataloader):
+    for X, y in dataloader:
         # data
         X, y = X.to(device), y.to(device)
         
@@ -114,7 +113,7 @@ def test_loop(dataloader, model, loss_fun, device):
     model.eval()
     test_loss, correct = 0, 0
     with torch.no_grad():
-        for X, y in tqdm(dataloader):
+        for X, y in dataloader:
             # getting data
             X, y = X.to(device), y.to(device)
             
@@ -135,15 +134,47 @@ def test_loop(dataloader, model, loss_fun, device):
     return test_loss, correct, peprlexity
 
 
+def plot_stats(stats):
+    x = range(len(stats))
+    loss = [stat[0] for stat in stats]
+    accuracy = [stat[1] for stat in stats]
+    perplexity = [stat[2] for stat in stats]
+    
+    plt.clf()
+    plt.plot(x, loss, label='loss')
+    #plt.plot(x, accuracy, label='accuracy')
+    plt.savefig('acc_loss.png')
+    
+    plt.clf()
+    plt.plot(x, perplexity, label='perplexity')
+    plt.savefig('perplexity.png')
+    
 
-        
-# dataset = NGramDataset('Auguste_Maquet.txt')
-# print("vocab size ", len(dataset.vocab))
-# dataloader = DataLoader(dataset, batch_size=512, shuffle=True)
-# Model = NueralLanguageModel(len(dataset.vocab)).to('cuda')
-# loss_fn = nn.CrossEntropyLoss()
-# optimizer = torch.optim.Adam(Model.parameters(), lr=0.1)
+if __name__ == "__main__":        
+    # hyperparameters
+    device = 'cuda'
+    batch_size = 512
+    epcohs = 4
+   
+    # Data creation
+    dataset = NGramDataset('Auguste_Maquet.txt')
+    train_data, valid_data, test_data = random_split(dataset, [0.8, 0.1, 0.1])
+    train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
+    valid_dataloader = DataLoader(valid_data, batch_size=batch_size, shuffle=True)
+    test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=True)
 
-# print(test_loop(dataloader, Model, loss_fn, "cuda"))
-# train_loop(dataloader, Model, loss_fn, optimizer, "cuda")
-# print(test_loop(dataloader, Model, loss_fn, "cuda"))
+    # Model creation
+    Model = NueralLanguageModel(len(dataset.vocab)).to(device)
+    
+    # Training
+    loss_fn = nn.CrossEntropyLoss()
+    optimizer = torch.optim.Adam(Model.parameters(), lr=0.1)
+    stats = []
+    for epoch in tqdm(range(epcohs)):
+        train_loop(train_dataloader, Model, loss_fn, optimizer, device)
+        stats.append(test_loop(valid_dataloader, Model, loss_fn, device))
+    plot_stats(stats)
+    
+    # Testing
+    Results = test_loop(test_dataloader, Model, loss_fn, device)
+    print(Results)
