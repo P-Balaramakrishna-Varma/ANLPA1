@@ -47,10 +47,11 @@ def test_get_tokens_from_text_corpus():
 
 # Custom dataset
 class LSTMDataset(Dataset):
-    def __init__(self, filename, len) :
+    def __init__(self, filename, seq_len) :
         super().__init__()
         # Preprocessing the text corpus
-        self.tokens = get_tokens_from_text_corpus(filename)[:1000]
+        self.tokens = get_tokens_from_text_corpus(filename)
+        self.tokens = self.tokens[:(int(len(self.tokens) / 4))]
         
         # Loading pretrained embedding
         self.pretrained_embedding = torchtext.vocab.GloVe(name='6B', dim=300)
@@ -60,8 +61,8 @@ class LSTMDataset(Dataset):
         self.vocab.set_default_index(self.vocab["<unk>"])
         
         # Max sequence length
-        self.seq_len = len
-        
+        self.seq_len = seq_len
+    
     def __len__(self):
         return len(self.tokens) - self.seq_len
     
@@ -159,8 +160,8 @@ if __name__ == "__main__":
     # hyperparameters
     device = 'cuda'
     batch_size = 1024
-    epcohs = 4
-    seq_len = 5
+    epcohs = 1
+    seq_len = 10
    
     # Data creation
     dataset = LSTMDataset('Auguste_Maquet.txt', seq_len)
