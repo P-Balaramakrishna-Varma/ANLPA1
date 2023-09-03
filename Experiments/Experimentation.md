@@ -20,3 +20,4 @@ dropout layer for regulazation. 0.8
 
 | id | seq_len | lr | epochs | batch |  perplexity | loss | accuracy |
 |----|---------|----|--------|-------|--------------|------|----------|
+| 1  | 15 | 0.001 | 5 | 1024 | 110 | 4.708 | 0.16 |

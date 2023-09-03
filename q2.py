@@ -51,7 +51,7 @@ class LSTMDataset(Dataset):
         super().__init__()
         # Preprocessing the text corpus
         self.tokens = get_tokens_from_text_corpus(filename)
-        #self.tokens = self.tokens[:(int(len(self.tokens) ))]
+        self.tokens = self.tokens[:(int(len(self.tokens) / 2))]
         
         # Loading pretrained embedding
         self.pretrained_embedding = torchtext.vocab.GloVe(name='6B', dim=300)
@@ -158,9 +158,9 @@ def plot_stats(stats):
 
 if __name__ == "__main__":        
     # hyperparameters
-    device = torch.device("cuda", index=1)
+    device = torch.device("cuda", index=0)
     batch_size = 1024
-    epcohs = 1
+    epcohs = 5
     seq_len = 15
    
     # Data creation
@@ -175,7 +175,7 @@ if __name__ == "__main__":
     
     # Training
     loss_fn = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(Model.parameters(), lr=0.01)
+    optimizer = torch.optim.Adam(Model.parameters(), lr=0.001)
     stats = []
     for epoch in tqdm(range(epcohs)):
         train_loop(train_dataloader, Model, loss_fn, optimizer, device)
