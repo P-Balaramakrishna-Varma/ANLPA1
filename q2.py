@@ -179,6 +179,7 @@ if __name__ == "__main__":
     for epoch in tqdm(range(epcohs)):
         train_loop(train_dataloader, Model, loss_fn, optimizer, device)
         stats.append(test_loop(valid_dataloader, Model, loss_fn, device))
+        print(stats[-1])
     plot_stats(stats)
     print(stats)
     

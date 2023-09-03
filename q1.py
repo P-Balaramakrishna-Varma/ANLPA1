@@ -156,7 +156,7 @@ def plot_stats(stats):
 if __name__ == "__main__":        
     # hyperparameters
     device = 'cuda'
-    batch_size = 1024
+    batch_size = 2048
     epcohs = 4
    
     # Data creation
@@ -176,6 +176,7 @@ if __name__ == "__main__":
     for epoch in tqdm(range(epcohs)):
         train_loop(train_dataloader, Model, loss_fn, optimizer, device)
         stats.append(test_loop(valid_dataloader, Model, loss_fn, device))
+        print(stats[-1])
     print(stats)
     plot_stats(stats)
     
