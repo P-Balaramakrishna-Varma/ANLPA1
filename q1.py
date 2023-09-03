@@ -81,10 +81,12 @@ class NueralLanguageModel(nn.Module):
         self.activation = nn.ReLU()
         self.hidden2 = nn.Linear(300, vocab_size)
         self.softmax = nn.Softmax(dim=1)
+        # self.dropout = nn.Dropout(0.9)
  
     def forward(self, x):
         # converts input into 300 dim vector
         x = self.hidden1(x)
+        # x = self.dropout(x)
         x = self.activation(x)
         
         # converts 300 dim vector into vocab_size dim vector
@@ -157,7 +159,7 @@ if __name__ == "__main__":
     # hyperparameters
     device = torch.device("cuda", index=0)
     batch_size = 64
-    epcohs = 2
+    epcohs = 10
     
     # Data creation
     dataset = NGramDataset('Auguste_Maquet.txt')
@@ -172,7 +174,7 @@ if __name__ == "__main__":
     
     # Training
     loss_fn = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(Model.parameters(), lr=0.01)
+    optimizer = torch.optim.Adam(Model.parameters(), lr=0.00001)
     stats = []
     print(test_loop(valid_dataloader, Model, loss_fn, device))
     for epoch in tqdm(range(epcohs)):

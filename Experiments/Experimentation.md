@@ -1,17 +1,20 @@
 ## Nueral
 
 | id | hidden_size | lr | epochs | batch |  perplexity | loss | accuracy |
-|----|----|--------|-------|--------------|------|----------|
-| 1  | 300 | 0.01 | 10 | 64 | 13909 | 9.54 | 0.05 |
-| 2  | 300 | 0.001 | 10 | 64 | 13509 | 9.51 | 0.089 |
-| 3  | 300 | 0.001 | 20 | 64 | 13358 | 9.499 | 0.1 |
-| 4  | 300 | 0.01 | 10 | 64 | 13827 | 9.53 | 0.065 | 0.5 dropout
-| 5 | 500 | 0.001 | 10 | 64 | 13705 | 9.52 | 0.07 |
+|----|-------------|----|-------|--------|-------------|------|----------|
+| 1  | 300 | 0.001 | 10 | 64 | 713 | 6.57 | 0.11 |
+| 2  | 300 | 0.001 | 10 | 64 | 733 | 6.59 | 0.06 |
+| 3  | 150 | 0.001 | 10 | 64 | 718 | 6.57 | 0.06  |
+| 4  | 10 | 0.001 | 10 | 64 | 735 | 6.59 | 0.06  |
+| 5 | 300 | 0.00001 | 10 | 64 | 288 | 5.66 | 0.13 |
 
-experiment one idicates overfitting.
-lowering learning rate || using dropout
-experiment 2 lower learning rate still drop try increasing epochs 20 (3)
-experiment 3 stabilized. no learning
+
+experiment one idicates overfitting. Increase in validation loss.
+dropout layer for regulazation. 0.8
+150 0.8 drop
+10 0.9 drop
+300 perpliexity also achived
+
 
 ## Recurent
 

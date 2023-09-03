@@ -79,15 +79,15 @@ class LSTMDataset(Dataset):
 class ReccurentLanguageModel(nn.Module):
     def __init__(self, vocab_size):
         super().__init__()
-        self.lstm = nn.LSTM(input_size=300, hidden_size=500, batch_first=True)
-        self.hidden2 = nn.Linear(500, vocab_size)
+        self.lstm = nn.LSTM(input_size=300, hidden_size=300, batch_first=True)
+        self.hidden2 = nn.Linear(300, vocab_size)
         self.softmax = nn.Softmax(dim=2)
  
     def forward(self, x):
-        # Lstm layer with 500 dim output
+        # Lstm layer with 300 dim output
         x, hidden = self.lstm(x)
         
-        # converts 500 dim vector into vocab_size dim vector
+        # converts 300 dim vector into vocab_size dim vector
         x = self.hidden2(x)
         # x = self.softmax(x)
         return x
