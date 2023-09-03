@@ -51,7 +51,7 @@ class LSTMDataset(Dataset):
         super().__init__()
         # Preprocessing the text corpus
         self.tokens = get_tokens_from_text_corpus(filename)
-        self.tokens = self.tokens[:(int(len(self.tokens) / 4))]
+        #self.tokens = self.tokens[:(int(len(self.tokens) ))]
         
         # Loading pretrained embedding
         self.pretrained_embedding = torchtext.vocab.GloVe(name='6B', dim=300)
@@ -89,7 +89,7 @@ class ReccurentLanguageModel(nn.Module):
         
         # converts 500 dim vector into vocab_size dim vector
         x = self.hidden2(x)
-        x = self.softmax(x)
+        # x = self.softmax(x)
         return x
 
 
@@ -158,10 +158,10 @@ def plot_stats(stats):
 
 if __name__ == "__main__":        
     # hyperparameters
-    device = 'cuda'
+    device = torch.device("cuda", index=1)
     batch_size = 1024
     epcohs = 1
-    seq_len = 10
+    seq_len = 15
    
     # Data creation
     dataset = LSTMDataset('Auguste_Maquet.txt', seq_len)
@@ -175,7 +175,7 @@ if __name__ == "__main__":
     
     # Training
     loss_fn = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(Model.parameters(), lr=0.1)
+    optimizer = torch.optim.Adam(Model.parameters(), lr=0.01)
     stats = []
     for epoch in tqdm(range(epcohs)):
         train_loop(train_dataloader, Model, loss_fn, optimizer, device)

@@ -89,7 +89,7 @@ class NueralLanguageModel(nn.Module):
         
         # converts 300 dim vector into vocab_size dim vector
         x = self.hidden2(x)
-        x = self.softmax(x)
+        # x = self.softmax(x)
         return x
 
 
@@ -155,12 +155,13 @@ def plot_stats(stats):
 
 if __name__ == "__main__":        
     # hyperparameters
-    device = 'cuda'
-    batch_size = 2048
-    epcohs = 4
-   
+    device = torch.device("cuda", index=0)
+    batch_size = 64
+    epcohs = 2
+    
     # Data creation
     dataset = NGramDataset('Auguste_Maquet.txt')
+    print(len(dataset)/ len(dataset.vocab))
     train_data, valid_data, test_data = random_split(dataset, [0.8, 0.1, 0.1])
     train_dataloader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
     valid_dataloader = DataLoader(valid_data, batch_size=batch_size, shuffle=True)
@@ -171,8 +172,9 @@ if __name__ == "__main__":
     
     # Training
     loss_fn = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(Model.parameters(), lr=0.1)
+    optimizer = torch.optim.Adam(Model.parameters(), lr=0.01)
     stats = []
+    print(test_loop(valid_dataloader, Model, loss_fn, device))
     for epoch in tqdm(range(epcohs)):
         train_loop(train_dataloader, Model, loss_fn, optimizer, device)
         stats.append(test_loop(valid_dataloader, Model, loss_fn, device))
