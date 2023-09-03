@@ -144,8 +144,11 @@ def plot_stats(stats):
     
     plt.clf()
     plt.plot(x, loss, label='loss')
-    #plt.plot(x, accuracy, label='accuracy')
-    plt.savefig('r_acc_loss.png')
+    plt.savefig('r_loss.png')
+    
+    plt.clf()
+    plt.plot(x, accuracy, label='accuracy')
+    plt.savefig('r_accuracy.png')
     
     plt.clf()
     plt.plot(x, perplexity, label='perplexity')
@@ -177,6 +180,7 @@ if __name__ == "__main__":
         train_loop(train_dataloader, Model, loss_fn, optimizer, device)
         stats.append(test_loop(valid_dataloader, Model, loss_fn, device))
     plot_stats(stats)
+    print(stats)
     
     # Testing
     Results = test_loop(test_dataloader, Model, loss_fn, device)

@@ -78,8 +78,8 @@ class GPTDataset(Dataset):
 class GPTLanguageModel(nn.Module):
     def __init__(self, vocab_size):
         super().__init__()
-        self.lstm = nn.LSTM(input_size=300, hidden_size=500, batch_first=True)
-        self.hidden2 = nn.Linear(500, vocab_size)
+        self.attention = nn.MultiheadAttention(embed_dim=300, num_heads=1, batch_first=True)
+        self.hidden2 = nn.Linear(300, vocab_size)
         self.softmax = nn.Softmax(dim=2)
  
     def forward(self, x):
@@ -144,8 +144,11 @@ def plot_stats(stats):
     
     plt.clf()
     plt.plot(x, loss, label='loss')
-    #plt.plot(x, accuracy, label='accuracy')
-    plt.savefig('g_acc_loss.png')
+    plt.savefig('g_loss.png')
+    
+    plt.clf()
+    plt.plot(x, accuracy, label='accuracy')
+    plt.savefig('g_accuracy.png')
     
     plt.clf()
     plt.plot(x, perplexity, label='perplexity')
@@ -177,6 +180,7 @@ if __name__ == "__main__":
         train_loop(train_dataloader, Model, loss_fn, optimizer, device)
         stats.append(test_loop(valid_dataloader, Model, loss_fn, device))
     plot_stats(stats)
+    print(stats)
     
     # Testing
     Results = test_loop(test_dataloader, Model, loss_fn, device)

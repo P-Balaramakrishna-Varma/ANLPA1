@@ -95,7 +95,7 @@ class NueralLanguageModel(nn.Module):
 
 def train_loop(dataloader, model, loss_fn, optimizer, device):
     model.train()
-    for X, y in dataloader:
+    for X, y in tqdm(dataloader):
         # data
         X, y = X.to(device), y.to(device)
         
@@ -113,7 +113,7 @@ def test_loop(dataloader, model, loss_fun, device):
     model.eval()
     test_loss, correct = 0, 0
     with torch.no_grad():
-        for X, y in dataloader:
+        for X, y in tqdm(dataloader):
             # getting data
             X, y = X.to(device), y.to(device)
             
@@ -142,8 +142,11 @@ def plot_stats(stats):
     
     plt.clf()
     plt.plot(x, loss, label='loss')
-    #plt.plot(x, accuracy, label='accuracy')
-    plt.savefig('n_acc_loss.png')
+    plt.savefig('n_loss.png')
+    
+    plt.clf()
+    plt.plot(x, accuracy, label='accuracy')
+    plt.savefig('n_accuracy.png')
     
     plt.clf()
     plt.plot(x, perplexity, label='perplexity')
@@ -173,6 +176,7 @@ if __name__ == "__main__":
     for epoch in tqdm(range(epcohs)):
         train_loop(train_dataloader, Model, loss_fn, optimizer, device)
         stats.append(test_loop(valid_dataloader, Model, loss_fn, device))
+    print(stats)
     plot_stats(stats)
     
     # Testing
