@@ -185,3 +185,7 @@ if __name__ == "__main__":
     # Testing
     Results = test_loop(test_dataloader, Model, loss_fn, device)
     print(Results)
+    
+    
+    # Saving the model
+    torch.save(Model.state_dict(), 'd_model.pt')
